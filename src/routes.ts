@@ -1,28 +1,16 @@
-// import { AuthController } from './modules/auth/auth.controller';
-// import { ExchageListController } from './modules/exchange-list/exchange-list.controller';
-// import { OfferListController } from './modules/offer-list/offer-list.controller';
-// import { UserController } from './modules/user/user.controller';
-// import { WishListController } from './modules/wish-list/wish-list.controller';
+import { AuthController } from "./modules/auth/auth.controller";
+import { CarController } from "./modules/car/car.controller";
+import { UserController } from "./modules/user/user.controller";
 
-// export const ROUTES = [
-//   {
-//     path: '/auth',
-//     router: AuthController,
-//   },
-//   {
-//     path: '/user',
-//     router: UserController,
-//   },
-//   {
-//     path: '/offer',
-//     router: OfferListController,
-//   },
-//   {
-//     path: '/wish',
-//     router: WishListController,
-//   },
-//   {
-//     path: '/exchange',
-//     router: ExchageListController,
-//   },
-// ];
+
+export const ROUTES = [
+  {
+    path: '/cars',
+    router: CarController,
+  },{
+    path: '/user',
+    router: UserController
+  },
+  {path: '/auth',
+  router: AuthController}
+];

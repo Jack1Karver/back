@@ -1,0 +1,7 @@
+node_modules
+/TestSuite4
+/freeton-nft-smart-contracts
+/True-NFT
+/keys
+/tests/addresses.json
+.env*

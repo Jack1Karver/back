@@ -1,0 +1,1 @@
+ALTER TABLE user_token ADD COLUMN token varchar NOT NULL

@@ -1,0 +1,20 @@
+{
+  "name": "@gb-io/whitepaper-contracts",
+  "version": "0.0.1",
+  "scripts": {
+    "test": "mocha -t 300000 'tests/tests.js'",
+    "test-main": "mocha -t 300000 --full-trace 'tests/main.test.js'",
+    "test-sell-only": "mocha -t 300000 'tests/sell.test.js'",
+    "test-sell": "mocha -t 300000 tests/main.test.js tests/sell.test.js",
+    "test-auction": "mocha -t 300000 tests/main.test.js tests/auction.test.js"
+  },
+  "dependencies": {
+    "@tonclient/appkit": "^0.2.0",
+    "@tonclient/core": "^1",
+    "@tonclient/lib-node": "^1",
+    "chai": "^4.2.0",
+    "chai-arrays": "^2.2.0",
+    "dotenv": "^10.0.0",
+    "mocha": "^8.4.0"
+  }
+}
