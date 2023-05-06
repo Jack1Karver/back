@@ -3,6 +3,7 @@ import { walletTypeEnum } from "../wallet/enums/wallet-type.enum";
 import { ContractsService } from "../contracts/contracts.service";
 import { UserService } from "./user.service";
 import { statusEnum } from "./enums/status.enum";
+import passport from "passport";
 
 
 
@@ -28,4 +29,8 @@ UserController.get('/nonce/:walletAddress', async (req, res)=>{
         const result =  (await userService.createWithWallet(walletAddress, statusEnum.pending, addressType)).nonce
         return res.status(200).json({nonce: result})
     }
+})
+
+UserController.get('/', passport.authenticate('jwt', {session: false}), async (req, res)=>{
+    res.send(req.user)
 })

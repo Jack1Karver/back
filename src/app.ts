@@ -1,10 +1,10 @@
 import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
-import cors from 'cors'
-import passport from 'passport'
-import dotenv from 'dotenv';
+import cors from 'cors';
+import passport from 'passport';
 import { passportfN } from './midleware/passport';
 import { ROUTES } from './routes';
+import cookieParser from 'cookie-parser'
     
 const PORT = process.env.PORT || 4001
 
@@ -15,15 +15,16 @@ app.use(cors({
 }));
 
 
-dotenv.config({path: '../.env'})
+// dotenv.config({path: '../.env'})
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }))
 app.use(bodyParser.json({ limit: '50mb' }))
+app.use(cookieParser());
 ROUTES.map(router=>{
     return app.use(`/api${router.path}`, router.router);
 })
 
 app.use(passport.initialize());
-passportfN
+passportfN(passport)
 
 app.use((req: Request, res: Response) => {
     res.status(404).send("<h1>ERROR 404 <br/> PAGE NOT FOUND</h1>")
