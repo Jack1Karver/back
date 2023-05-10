@@ -23,7 +23,6 @@ export class AuthService {
   tokenService = new TokenService();
 
   async auth(data: WalletAuthDto): Promise<IOauthResponse> {
-    console.log(data);
     let user = await this.userService.getUserByWalletAddress(data.address);
     let registrationStatus = registrationStatusesEnum.existing;
 

@@ -1,7 +1,9 @@
-export interface ICarAd{
-    id: number,
-    car_id: number,
-    status: string,
-    price: string,
-    
+export interface ICarAd {
+  id: number;
+  car_features_id: number;
+  owner_id: number;
+  description: string;
+  status: string;
+  offer_id: string;
+  address?: string;
 }

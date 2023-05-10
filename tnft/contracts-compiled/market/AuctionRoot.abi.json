@@ -1,0 +1,189 @@
+{
+	"ABI version": 2,
+	"header": ["pubkey", "time", "expire"],
+	"functions": [
+		{
+			"name": "constructor",
+			"inputs": [
+				{"name":"codeIndex","type":"cell"},
+				{"name":"_pubkey","type":"uint256"},
+				{"name":"_offerCode","type":"cell"},
+				{"name":"_deploymentFee","type":"uint128"},
+				{"name":"_offersStorageFee","type":"uint128"},
+				{"name":"_marketFee","type":"uint8"},
+				{"name":"_marketFeeDecimals","type":"uint8"},
+				{"name":"_auctionBidDelta","type":"uint8"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "deployOffer",
+			"inputs": [
+				{"name":"_addrRoot","type":"address"},
+				{"name":"_addrIndex","type":"address"},
+				{"name":"_addrData","type":"address"},
+				{"name":"_price","type":"uint128"},
+				{"name":"_hash","type":"bytes"},
+				{"name":"_auctionDuration","type":"uint128"}
+			],
+			"outputs": [
+				{"name":"offerAddress","type":"address"}
+			]
+		},
+		{
+			"name": "confirmOffer",
+			"inputs": [
+				{"name":"_royalty","type":"uint8"},
+				{"name":"_royaltyAuthor","type":"address"}
+			],
+			"outputs": [
+				{"name":"offerAddress","type":"address"}
+			]
+		},
+		{
+			"name": "declineOffer",
+			"inputs": [
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "changeOffersStorageFee",
+			"inputs": [
+				{"name":"_value","type":"uint8"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "pendingOfferExists",
+			"inputs": [
+				{"name":"_addr","type":"address"}
+			],
+			"outputs": [
+				{"name":"offerExists","type":"bool"}
+			]
+		},
+		{
+			"name": "getOfferAddress",
+			"inputs": [
+				{"name":"_addrData","type":"address"},
+				{"name":"_price","type":"uint128"},
+				{"name":"_hash","type":"bytes"}
+			],
+			"outputs": [
+				{"name":"offerAddress","type":"address"}
+			]
+		},
+		{
+			"name": "changeDeploymentFee",
+			"inputs": [
+				{"name":"_value","type":"uint128"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "changeMarketFee",
+			"inputs": [
+				{"name":"_value","type":"uint8"},
+				{"name":"_decimals","type":"uint8"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "setOfferCode",
+			"inputs": [
+				{"name":"_newCode","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "withdraw",
+			"inputs": [
+				{"name":"_dest","type":"address"},
+				{"name":"_value","type":"uint128"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "resolveCodeHashIndex",
+			"inputs": [
+				{"name":"addrRoot","type":"address"},
+				{"name":"addrOwner","type":"address"}
+			],
+			"outputs": [
+				{"name":"codeHashIndex","type":"uint256"}
+			]
+		},
+		{
+			"name": "resolveIndex",
+			"inputs": [
+				{"name":"addrRoot","type":"address"},
+				{"name":"addrData","type":"address"},
+				{"name":"addrOwner","type":"address"}
+			],
+			"outputs": [
+				{"name":"addrIndex","type":"address"}
+			]
+		},
+		{
+			"name": "marketFee",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"marketFee","type":"uint8"}
+			]
+		},
+		{
+			"name": "marketFeeDecimals",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"marketFeeDecimals","type":"uint8"}
+			]
+		},
+		{
+			"name": "deploymentFee",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"deploymentFee","type":"uint128"}
+			]
+		},
+		{
+			"name": "auctionBidDelta",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"auctionBidDelta","type":"uint8"}
+			]
+		}
+	],
+	"data": [
+	],
+	"events": [
+		{
+			"name": "auctionDeployed",
+			"inputs": [
+				{"name":"offerAddress","type":"address"},
+				{"components":[{"name":"addrRoot","type":"address"},{"name":"addrOwner","type":"address"},{"name":"addrData","type":"address"},{"name":"addrIndex","type":"address"},{"name":"addrOffer","type":"address"},{"name":"price","type":"uint128"},{"name":"auctionDuration","type":"uint128"},{"name":"deployHash","type":"bytes"}],"name":"offerInfo","type":"tuple"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "auctionDeclined",
+			"inputs": [
+				{"name":"offerAddress","type":"address"},
+				{"components":[{"name":"addrRoot","type":"address"},{"name":"addrOwner","type":"address"},{"name":"addrData","type":"address"},{"name":"addrIndex","type":"address"},{"name":"addrOffer","type":"address"},{"name":"price","type":"uint128"},{"name":"auctionDuration","type":"uint128"},{"name":"deployHash","type":"bytes"}],"name":"offerInfo","type":"tuple"}
+			],
+			"outputs": [
+			]
+		}
+	]
+}

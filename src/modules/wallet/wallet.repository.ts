@@ -19,8 +19,6 @@ export class WalletRepository extends AbstractRepository{
     }
 
     async updateWalletByAddress(address: string, status: string, pubkey: string){
-        console.log(status)
-        console.log(pubkey)
         await this.connection.sqlQuery(`UPDATE wallet SET (status, pubkey) = ('${status}', '${pubkey}') WHERE address = '${address}'`)
     }
 

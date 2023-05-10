@@ -1,4 +1,5 @@
 export interface IFile{
     id: number,
-    path: string
+    path: string,
+    car_id: number
 }
