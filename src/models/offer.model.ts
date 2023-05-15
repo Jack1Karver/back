@@ -5,9 +5,4 @@ export interface IOffer {
     price: number;
     date_created: Date;
     date_closed?: Date;
-    status: string;
-    sell_proxy: {
-      abi: string;
-      address: string;
-    };
   }

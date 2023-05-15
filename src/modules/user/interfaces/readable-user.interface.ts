@@ -1,5 +1,5 @@
-import { IUser } from '../../../models/user.model';
+import { IUserDto } from '../dto/user.dto';
 
-export interface IReadableUser extends IUser {
+export interface IReadableUser extends IUserDto {
   accessToken: string;
 }

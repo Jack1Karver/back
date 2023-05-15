@@ -8,7 +8,7 @@ export abstract class AbstractRepository {
     }
   }
 
-  protected getIdOrInsert = async (table: string, columns: object, conj: boolean  = false)=>{
+  protected getIdOrInsert = async (table: string, columns: object, conj: boolean  = false): Promise<number>=>{
     try{
       Object.keys(columns).forEach(key=>{
         if(columns[key] === null){
@@ -22,6 +22,7 @@ export abstract class AbstractRepository {
     return result[0].id
   } catch(e){
     console.log(e)
+    throw new Error
   }
   }
 

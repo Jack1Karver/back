@@ -1,12 +1,20 @@
-export interface IUserDto{
-    id: number
+import { IWallet } from "../../../models/wallet.model";
+
+export interface IUserDto {
+    id: number;
     slug: string;
-    wallet_id: number;
+    wallet: IWallet;
     name: string;
     bio?: string;
-    role_id: number;
-    status_id: number;
+    role: string;
+    email?: string;
     nonce: string;
     memo: string;
-    date_register: Date
-}
+    status: string;
+    notificationEmail?: {
+      email: string;
+      isConfirmed: boolean;
+    };
+    dateRegister: Date
+  }
+  

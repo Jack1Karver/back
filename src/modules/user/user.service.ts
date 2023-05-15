@@ -12,7 +12,7 @@ export class UserService {
   private userRepository = new UserRepository();
   private walletService = new WalletService();
 
-  async getUserByWalletAddress(address: string): Promise<IUser | null> {
+  async getUserByWalletAddress(address: string): Promise<IUserDto | null> {
     const user = await this.userRepository.findUserByWalletAddress(address);
     if (user) {
       return await this.serializeUser(user);
@@ -20,7 +20,7 @@ export class UserService {
     return null;
   }
 
-  async getUserById(id: number): Promise<IUser | null> {
+  async getUserById(id: number): Promise<IUserDto | null> {
     const user = await this.userRepository.findUserById(id);
     if (user) {
       return await this.serializeUser(user);
@@ -32,9 +32,9 @@ export class UserService {
     address: string,
     userStatus: statusEnum = statusEnum.active,
     walletType: walletTypeEnum = walletTypeEnum.external
-  ): Promise<IUser> {
+  ): Promise<IUserDto> {
     try {
-      const createdUser: Omit<IUserDto, 'id'> = {
+      const createdUser: Omit<IUser, 'id'> = {
         name: stripAddress(address),
         slug: walletType === walletTypeEnum.ethereum ? createHashName(address) : address,
         status_id: await this.userRepository.getStatusId(userStatus),
@@ -60,7 +60,7 @@ export class UserService {
     }
   }
 
-  async serializeUser(user: IUserDto): Promise<IUser> {
+  async serializeUser(user: IUser): Promise<IUserDto> {
     return {
       id: user.id,
       role: (await this.userRepository.getRole(user.role_id)).role,
@@ -78,7 +78,7 @@ export class UserService {
     await this.userRepository.updateNonce(id, uuidV4());
   }
 
-  async makeActive(id: number): Promise<IUser | null> {
+  async makeActive(id: number): Promise<IUserDto | null> {
     await this.userRepository.updateStatus(id, await this.userRepository.getStatusId(statusEnum.active));
     return await this.getUserById(id);
   }

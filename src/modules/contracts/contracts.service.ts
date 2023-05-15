@@ -1,9 +1,10 @@
-import { AccountAddressType, TonClient } from '@eversdk/core';
+import { AccountAddressType, NetworkQueriesProtocol, TonClient } from '@eversdk/core';
 import { libNode } from '@eversdk/lib-node';
 import { EVER_HTTPS_ENDPOINTS } from '../../config/ton.config';
 
 export class ContractsService {
   readonly client: TonClient;
+  readonly wsClient: TonClient;
 
   constructor() {
     TonClient.useBinaryLibrary(libNode);
@@ -12,6 +13,13 @@ export class ContractsService {
         endpoints: EVER_HTTPS_ENDPOINTS,
       },
     });
+    this.wsClient = new TonClient({
+      network: {
+        endpoints: EVER_HTTPS_ENDPOINTS,
+        queries_protocol: NetworkQueriesProtocol.WS,
+      },
+    });
+    
   }
 
   async isAccountAddress(address: string): Promise<boolean> {

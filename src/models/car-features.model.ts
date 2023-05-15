@@ -6,7 +6,7 @@ export interface ICarFeatures {
   drive_type_id: number;
   gearbox_type_id: number;
   hp: number;
-  engine_capacity: number;
+  engine_capacity?: number;
   color: string;
   mileage: number;
 }

@@ -1,4 +1,8 @@
 CREATE TABLE offer(
     id serial NOT NULL,
-    contract_address
+    contract_address varchar,
+    price integer NOT NULL,
+    date_created date NOT NULL,
+    date_closed date,
+    PRIMARY KEY (id)
 )

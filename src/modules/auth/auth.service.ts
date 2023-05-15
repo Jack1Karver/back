@@ -15,6 +15,7 @@ import { addOneDay } from '../../utils/date.util';
 import { TokenService } from '../token/token.service';
 import { Response } from 'express';
 import { SECRET_TOKEN } from '../../config/secret';
+import { IUserDto } from '../user/dto/user.dto';
 
 export class AuthService {
   userService = new UserService();
@@ -48,7 +49,7 @@ export class AuthService {
     return { status: registrationStatus, user: await this.getLoggedInUser(user) };
   }
 
-  private async getLoggedInUser(user: IUser): Promise<IReadableUser> {
+  private async getLoggedInUser(user: IUserDto): Promise<IReadableUser> {
     const token = await this.getUserToken(user);
     const readableUser = user as IReadableUser;
 
@@ -57,7 +58,7 @@ export class AuthService {
     return readableUser;
   }
 
-  async getUserToken(user: IUser, withStatusCheck = true): Promise<string> {
+  async getUserToken(user: IUserDto, withStatusCheck = true): Promise<string> {
     if (withStatusCheck && user.status !== statusEnum.active) {
       throw new Error();
     }
