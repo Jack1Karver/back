@@ -91,6 +91,11 @@ export class CarService {
 
       await this.carRepository.updateCarPrototype(carPrototype);
     }
+    return await this.serializePrototype(await this.carRepository.getPrototype(carPrototype.id))
+  }
+
+  async deletePrototype(id: string){
+    await this.carRepository.deletePrototype(id)
   }
 
   async serializeMark(mark: IMark): Promise<IMarkDto> {
@@ -111,6 +116,8 @@ export class CarService {
           carFeatures: await this.serializeFeatures(await this.carRepository.getCarFeatures(prototype.car_features_id)),
           description: prototype.description,
           owner: owner,
+          json: prototype.json,
+          jsonHash: prototype.json_hash
         };
       } else throw { message: 'User not found' };
     } catch (e) {
@@ -122,6 +129,7 @@ export class CarService {
   async serializeFeatures(features: ICarFeatures): Promise<ICarFeaturesDto> {
     try {
       return {
+        id: features.id,
         model: await this.serializeModel(await this.carRepository.getModelById(features.model_id)),
         yearProd: features.year_prod,
         engineType: (await this.carRepository.getEngineTypeById(features.engine_type_id)).e_type,

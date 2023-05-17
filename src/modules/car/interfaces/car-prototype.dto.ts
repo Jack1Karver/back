@@ -7,5 +7,7 @@ export interface ICarPrototypeDto{
     carFeatures: ICarFeaturesDto;
     description: string;
     owner: IUserDto;
-    files?: File[]
+    files?: File[];
+    json?: string;
+    jsonHash?: string;
 }

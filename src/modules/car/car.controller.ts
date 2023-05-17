@@ -68,3 +68,15 @@ CarController.post(
     }
   }
 );
+
+CarController.delete('/delete', async (req, res) => {
+  try {
+    const id = req.query.id;
+    if (id) {
+      await carService.deletePrototype(id as string);
+    }
+    return res.status(200);
+  } catch (e) {
+    errorHandler(e, res);
+  }
+});

@@ -22,6 +22,7 @@ export interface ICar extends ISimpleCar{
 }
 
 export interface ICarFeaturesDto {
+  id?:number;
   model: IModelDto;
   yearProd: number;
   engineType: string;

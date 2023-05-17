@@ -164,4 +164,8 @@ export class CarRepository extends AbstractRepository {
       throw new Error();
     }
   }
+
+  async deletePrototype(id: string){
+    await this.connection.sqlQuery(`DELETE FROM car_prototype WHERE id = ${id}`)
+  }
 }
