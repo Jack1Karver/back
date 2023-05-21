@@ -1,3 +1,5 @@
+import { IFile } from "./file.model";
+
 export interface ICarPrototype {
     id: number;
     car_features_id: number;

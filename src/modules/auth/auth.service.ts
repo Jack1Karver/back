@@ -96,4 +96,10 @@ export class AuthService {
   clearJWTCookie(res: Response): void {
     res.clearCookie('access_token');
   }
+
+  async logout(userId: number): Promise<boolean> {
+    await this.tokenService.deleteAll(userId);
+
+    return true;
+  }
 }

@@ -9,4 +9,8 @@ export class TokenService{
     async create(token: IUserToken){
         await this.tokenRepository.saveToken(token)
     }
+
+    async deleteAll(id: number){
+        return this.tokenRepository.deleteAll(id);
+    }
 }

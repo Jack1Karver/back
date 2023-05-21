@@ -3,6 +3,7 @@ import { engineType } from "../../../interfaces/enums/engine-type";
 import { gearboxType } from "../../../interfaces/enums/gearbox-type";
 import { IOffer } from "../../../models/offer.model";
 import { IUser } from "../../../models/user.model";
+import { IUserDto } from "../../user/dto/user.dto";
 import { IModelDto } from "./model.dto";
 
 export interface ISimpleCar {
@@ -13,11 +14,11 @@ export interface ISimpleCar {
 }
 
 export interface ICar extends ISimpleCar{
-  owner: IUser;
+  owner: IUserDto;
   description: string;
   dateCreated: Date;
-  status: string;
   jsonHash: string;
+  json: string;
   offer?: IOffer;
 }
 

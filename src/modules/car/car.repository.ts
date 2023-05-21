@@ -1,9 +1,11 @@
 import { AbstractRepository } from '../../db/abstract.repository';
+import { ICarAd } from '../../models/car-ad.model';
 import { ICarFeatures } from '../../models/car-features.model';
 import { ICarPrototype } from '../../models/car-prototype.model';
 import { ICountry } from '../../models/country.model';
 import { IDriveType } from '../../models/drive-type.model';
 import { IEngineType } from '../../models/engine-type.model';
+import { IFile } from '../../models/file.model';
 import { IGearboxType } from '../../models/gearbox-type.model';
 import { IMark } from '../../models/mark.model';
 import { IModel } from '../../models/model.model';
@@ -59,6 +61,10 @@ export class CarRepository extends AbstractRepository {
       console.log(e);
       throw new Error();
     }
+  }
+
+  async getModelByName(name: string, mark_id: string): Promise<IModel> {
+    return (await this.getByFields('model', { name, mark_id }))[0];
   }
 
   async getCountryById(id: number): Promise<ICountry> {
@@ -156,16 +162,45 @@ export class CarRepository extends AbstractRepository {
     }
   }
 
-  async updateCarPrototype(carProt: ICarPrototype){
+  async updateCarPrototype(carProt: ICarPrototype) {
     try {
-      await this.updateTable('car_prototype',  carProt);
+      await this.updateTable('car_prototype', carProt);
     } catch (e) {
       console.log(e);
       throw new Error();
     }
   }
 
-  async deletePrototype(id: string){
-    await this.connection.sqlQuery(`DELETE FROM car_prototype WHERE id = ${id}`)
+  async deletePrototype(id: string | number) {
+    await this.connection.sqlQuery(`DELETE FROM car_prototype WHERE id = ${id}`);
+  }
+
+  async getPrototypeOnCreation(json: string, ownerAddr: string) {
+    return (
+      await this.connection.sqlQuery(`SELECT cp.* FROM car_prototype as cp JOIN user_table as ut
+     ON cp.owner_id = ut.id
+     JOIN wallet ON ut.wallet_id = wallet.id 
+     WHERE wallet.address = '${ownerAddr}' AND cp.json = '${json}'`)
+    )[0];
+  }
+
+  async getFilesPrototype(id: number): Promise<IFile[]> {
+    return await this.getByFields('file_prot', { car_prototype_id: id });
+  }
+
+  async createCar(carPrototype: Omit<ICarPrototype, 'id'>, address: string) {
+    return await this.insertAndGetID('car_ad', { ...carPrototype, address });
+  }
+
+  async addFile(path: string, id: number) {
+    return await this.insertAndGetID('file', { path, car_ad_id: id });
+  }
+
+  async getCar(id: number) {
+    return (await this.getByFields('car_ad', { id }))[0];
+  }
+
+  async getCarByAddress(address: string){
+    return (await this.getByFields('car_ad', {address}))[0] as ICarAd
   }
 }

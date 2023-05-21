@@ -82,4 +82,8 @@ export class UserService {
     await this.userRepository.updateStatus(id, await this.userRepository.getStatusId(statusEnum.active));
     return await this.getUserById(id);
   }
+
+  async getUserBySlug(userSlug: string){
+    return await this.serializeUser(await this.userRepository.getUserBySlug(userSlug))
+  }
 }

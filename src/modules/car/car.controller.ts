@@ -5,11 +5,15 @@ import { ContractsService } from '../contracts/contracts.service';
 import passport, { use } from 'passport';
 import { IUser } from '../../models/user.model';
 import { upload } from '../../midleware/multer';
+import { CarSubscriber } from './car.subscriber';
 
 export const CarController = Router();
 
 const contractsService = new ContractsService();
-const carService = new CarService(contractsService);
+const carService = new CarService();
+
+const contractsSubscriber = new CarSubscriber(contractsService);
+contractsSubscriber.onModuleInit();
 
 CarController.get('/popular', async (req, res) => {
   try {
@@ -80,3 +84,25 @@ CarController.delete('/delete', async (req, res) => {
     errorHandler(e, res);
   }
 });
+
+CarController.get('/mark', async(req, res)=>{
+  const name = req.query.name as string
+  try{
+    const result = carService.getMarkByName(name)
+    return res.status(200).json(result);
+  } catch (e) {
+    errorHandler(e, res);
+  }
+  
+})
+
+CarController.get('/model', async(req, res)=>{
+      try{
+      const name = req.query.name as string
+      const markId = req.query.markId as string
+      const result = carService.getModelByName(name, markId)
+      return res.status(200).json(result);
+    } catch (e) {
+      errorHandler(e, res);
+    }
+})

@@ -2,28 +2,45 @@ import { Connection } from './connection';
 
 export abstract class AbstractRepository {
   protected connection = new Connection();
-  protected async insertArrayObjects(tableName: string, arrayObject: object[], foreignKeyField?: string, foreign_id?: number) {
+  protected async insertArrayObjects(
+    tableName: string,
+    arrayObject: object[],
+    foreignKeyField?: string,
+    foreign_id?: number
+  ) {
     for (let object of arrayObject) {
       this.insertAndGetID(tableName, object, foreignKeyField, foreign_id);
     }
   }
 
-  protected getIdOrInsert = async (table: string, columns: object, conj: boolean  = false): Promise<number>=>{
-    try{
-      Object.keys(columns).forEach(key=>{
-        if(columns[key] === null){
-          delete columns[key]
+  protected getIdOrInsert = async (table: string, columns: object, conj: boolean = false): Promise<number> => {
+    try {
+      Object.keys(columns).forEach(key => {
+        if (columns[key] === null) {
+          delete columns[key];
         }
-      })
-    const result = await this.getByFields(table, columns, conj)
-    if(!result.length){
-      return await this.insertAndGetID(table, columns)
+      });
+      const result = await this.getByFields(table, columns, conj);
+      if (!result.length) {
+        return await this.insertAndGetID(table, columns);
+      }
+      return result[0].id;
+    } catch (e) {
+      console.log(e);
+      throw new Error();
     }
-    return result[0].id
-  } catch(e){
-    console.log(e)
-    throw new Error
-  }
+  };
+
+  protected createConditions(columns: object, conj: boolean = false): string {
+    const columnValues = Object.values(columns);
+    const columnNames = Object.keys(columns).map(columnName => columnName);
+    const conditions = columnNames
+      .map((cond, index) => {
+        return `"${cond}" = '${columnValues[index]}'`;
+      })
+      .join(conj ? ' AND ' : ' OR ');
+
+    return conditions;
   }
 
   protected async insertAndGetID(
@@ -48,7 +65,7 @@ export abstract class AbstractRepository {
       return this.getID_afterInsert(result);
     } catch (e) {
       console.log(e);
-      throw new Error()
+      throw new Error();
     }
   }
 
@@ -75,16 +92,10 @@ export abstract class AbstractRepository {
     return queryResult[0].id;
   }
 
-  protected getByFields(table: string, columns: object, conj: boolean = false) {
-    const columnValues = Object.values(columns);
-    const columnNames = Object.keys(columns).map((columnName: string) => `${columnName}`);
-    const conditions = columnNames
-      .map((cond, index) => {
-        return `"${cond}" = '${columnValues[index]}'`;
-      })
-      .join(conj ? ' AND ' : ' OR ');
-      
-      const query = `SELECT * FROM ${table} WHERE ${conditions}`
+  protected getByFields(table: string, columns: object, conj: boolean = false, limit?: string, offset?: string) {
+    const query = `SELECT * FROM ${table} WHERE ${this.createConditions(columns, conj)} ${
+      limit ? `LIMIT ${limit}` : ''
+    } ${offset ? `OFFSET ${offset}` : ''}`;
     return this.connection.sqlQuery(query);
   }
 }

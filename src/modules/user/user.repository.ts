@@ -51,4 +51,8 @@ export class UserRepository extends AbstractRepository {
   async updateStatus(id: number, status_id: number){
    await this.updateTable('user_table', {id, status_id})
   }
+
+  async getUserBySlug(slug: string):Promise<IUser>{
+    return (await this.getByFields('user_table', {slug}))[0]
+  }
 }

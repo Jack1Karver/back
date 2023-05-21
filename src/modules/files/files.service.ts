@@ -1,6 +1,7 @@
 import { ICarPrototype } from '../../models/car-prototype.model';
 import { FilesRepository } from './files.repository';
 import { IFileProperties, ITip4ItemJson } from './interfaces/file-properties.interface';
+import fs from 'fs'
 
 export class FilesService {
 
@@ -35,5 +36,22 @@ export class FilesService {
     for (const file of files){
         await this.filesRepository.saveFilePrototype(car_prototype_id, file.path)
     }
+  }
+
+  async getPrototypeFiles(id: number){
+    const files =  await this.filesRepository.getPrototypeFiles(id);
+    const filesArr = files.map(file=>{
+      return fs.readFileSync(file.path, {encoding:'base64'})
+    })
+
+    return filesArr
+  }
+
+  async getFiles(id: string){
+    const files =  await this.filesRepository.getFiles(id);
+    const filesArr = files.map(file=>{
+      return fs.readFileSync(file.path, {encoding:'base64'})
+    })
+    return filesArr
   }
 }

@@ -7,10 +7,12 @@ import { ResultOfSubscribeCollection } from '@eversdk/core/dist/modules';
 import { IMessage, IMessageResult } from '../contracts/interfaces/message.interface';
 import { ContractsService } from '../contracts/contracts.service';
 import { ROOTS } from '../../config/roots.config';
+import { CarService } from './car.service';
 
 export class CarSubscriber {
   private rootAddresses: string[] = [];
   private rootsSubscription: ResultOfSubscribeCollection = {handle: 0}
+  carService = new CarService();
 
   constructor(
     private readonly contractsService: ContractsService,
@@ -66,5 +68,7 @@ export class CarSubscriber {
         decodedValue: decoded?.value,
       })}`
     );
+    
+    this.carService.createItemFromEvent(decoded.value)
   }
 }
