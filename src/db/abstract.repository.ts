@@ -94,8 +94,7 @@ export abstract class AbstractRepository {
 
   protected getByFields(table: string, columns: object, conj: boolean = false, limit?: string, offset?: string) {
     const query = `SELECT * FROM ${table} WHERE ${this.createConditions(columns, conj)} ${
-      limit ? `LIMIT ${limit}` : ''
-    } ${offset ? `OFFSET ${offset}` : ''}`;
+      limit ? `LIMIT ${limit}` : ''} ${offset ? `OFFSET ${offset}` : ''}`;
     return this.connection.sqlQuery(query);
   }
 }

@@ -4,11 +4,10 @@ import cors from 'cors';
 import passport from 'passport';
 import { passportfN } from './midleware/passport';
 import { ROUTES } from './routes';
-import multer from 'multer';
 import cookieParser from 'cookie-parser'
 import { upload } from './midleware/multer';
     
-const PORT = process.env.PORT || 4001
+const PORT = 4001
 
 const app = express()
 app.use(cors({
@@ -16,8 +15,6 @@ app.use(cors({
     origin: "http://localhost:3000"
 }));
 
-
-// dotenv.config({path: '../.env'})
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }))
 app.use(bodyParser.json({ limit: '50mb' }))
 app.use(cookieParser());

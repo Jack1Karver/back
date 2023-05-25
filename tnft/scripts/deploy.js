@@ -36,7 +36,7 @@ TonClient.useBinaryLibrary(libNode);
 })();
 
 async function main(client) {
-  const rootOwnerAddress = '0:1c0a0f816025e2a854e1b16629a6d953270d7cd0c9a0b414fe47f24f6c0849b1'
+  const rootOwnerAddress = process.env.ROOT_ADDRESS
   let addresses = {}
 
   const nftRoot = new Account(contracts.NftRootContract, {

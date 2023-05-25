@@ -22,7 +22,7 @@ const {
 } = require("../z-contracts-add/multisig/SafeMultisigWalletContract");
 
 const config = {
-  tokenName: utf8ToHex(process.env.TOKEN_NAME || "grandbazar.io"),
+  tokenName: utf8ToHex(process.env.TOKEN_NAME || "drivefy"),
   tokenSymbol: utf8ToHex(process.env.TOKEN_SYMBOL || "NGBT"),
   endpoint: "http://127.0.0.1/",
   contracts: {
