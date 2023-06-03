@@ -3,6 +3,7 @@ import { engineType } from "../../../interfaces/enums/engine-type";
 import { gearboxType } from "../../../interfaces/enums/gearbox-type";
 import { IOffer } from "../../../models/offer.model";
 import { IUser } from "../../../models/user.model";
+import { IOfferDto } from "../../offer/interfaces/offer.interface";
 import { IUserDto } from "../../user/dto/user.dto";
 import { IModelDto } from "./model.dto";
 
@@ -19,7 +20,7 @@ export interface ICar extends ISimpleCar{
   dateCreated: Date;
   jsonHash: string;
   json: string;
-  offer?: IOffer;
+  offer?: IOfferDto;
 }
 
 export interface ICarFeaturesDto {

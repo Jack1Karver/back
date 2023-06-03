@@ -1,6 +1,3 @@
-const nodeEnv = process.env.NODE_ENV === 'production' ? 'production' : 'development';
-require('dotenv').config({ path: `.env.${nodeEnv}` });
-const isDev = nodeEnv !== 'production';
 const fs = require('fs');
 
 const { Account } = require('@tonclient/appkit');

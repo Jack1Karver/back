@@ -203,4 +203,18 @@ export class CarRepository extends AbstractRepository {
   async getCarByAddress(address: string){
     return (await this.getByFields('car_ad', {address}))[0] as ICarAd
   }
+
+  async getOffers(){
+    const res = (await this.connection.sqlQuery(`SELECT car_ad.* from car_ad 
+    JOIN offer ON car_ad.id = offer.car_id ORDER BY offer.date_created DESC LIMIT 3`)) as ICarAd[]
+    return res
+  }
+
+  async updateOwner (id: string, owner_id: number){
+    const res = (await this.updateTable('car_ad', {id, owner_id}))
+  }
+
+  async getStatusId(status:string){
+    return await this.getIdOrInsert('status', {status})
+}
 }

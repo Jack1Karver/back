@@ -2,7 +2,8 @@
   "name": "@drivefy/whitepaper-contracts",
   "version": "0.0.1",
   "scripts": {
-    "deploy" : "node scripts/deploy.js",
+    "deploy": "node scripts/deploy.js",
+    "compile": "bash scripts/compile.sh",
     "test": "mocha -t 300000 'tests/tests.js'",
     "test-main": "mocha -t 300000 --full-trace 'tests/main.test.js'",
     "test-sell-only": "mocha -t 300000 'tests/sell.test.js'",

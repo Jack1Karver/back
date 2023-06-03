@@ -11,11 +11,12 @@ export class FilterService {
   userService = new UserService();
 
   async getCarsByFilter(filter: ICarFilter) {
-    let userId: number | null = null;
+
+    let ownerId: number | null = null;
     let modelId: number | null = null;
     let markId: number | null = null;
     if (filter.owner) {
-      userId = (await this.userService.getUserBySlug(filter.owner)).id;
+      ownerId = (await this.userService.getUserBySlug(filter.owner)).id;
     }
     if (filter.mark) {
       markId = (await this.carService.getMarkByName(filter.mark)).id;
@@ -27,7 +28,7 @@ export class FilterService {
       {
         markId,
         modelId,
-        userId,
+        ownerId,
         yearFrom: filter.year_from,
         year_to: filter.year_to,
       },
@@ -44,11 +45,12 @@ export class FilterService {
      const count = await this.filterRepository.getCarsCount({
       markId,
       modelId,
-      userId,
+      ownerId,
       yearFrom: filter.year_from,
       year_to: filter.year_to,
     },)
     
     return {items: carsSerialized, count}
   }
+  
 }

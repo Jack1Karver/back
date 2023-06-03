@@ -1,27 +1,36 @@
+import { ROOTS } from '../../config/roots.config';
+import { AbstractNftDataAccount } from '../../contract-accounts/abstract-nft-data.account';
 import { deployedStatusEnum } from '../../interfaces/enums/deployed-status.enum';
 import { IOffer } from '../../models/offer.model';
 import { IUser } from '../../models/user.model';
 import { fromNano } from '../../utils/contract.util';
 import { CarService } from '../car/car.service';
 import { ICar } from '../car/interfaces/car.dto';
+import { ContractsService } from '../contracts/contracts.service';
 import { IUserDto } from '../user/dto/user.dto';
 import { UserService } from '../user/user.service';
 import { blockingReasonsEnum } from './enums/blocking-reasons.enum';
+import { offerContractsEventsEnum } from './enums/offer-contracts-events.enum';
 import { statusEnum } from './enums/status.enum';
 import { ICreateOffer } from './interfaces/create-offer.interface';
 import { IOfferInfo } from './interfaces/offer-error.interface';
 import { IOfferDto } from './interfaces/offer.interface';
+import { ISellCancelled } from './interfaces/sell-cancelled.interface';
+import { ISellConfirmed } from './interfaces/sell-confirmed.interface';
 import { ISellDeployedTnftEvent } from './interfaces/sell-deployed-tnft-event.interface';
 import { ISellDeployed } from './interfaces/sell-deployed.interface';
 import { OfferRepository } from './offer.repository';
+import { OfferSerializer } from './offer.serializer';
 
 export class OfferService {
   offerRepository = new OfferRepository();
   userService = new UserService();
   carService = new CarService();
+  contractsService = new ContractsService();
+  offerSerializer = new OfferSerializer()
 
   async findOpenedByAddress(offerAddress: string) {
-    return await this.serializeOffer(await this.offerRepository.findOpenedByAddress(offerAddress));
+    return await this.offerSerializer.serializeOffer(await this.offerRepository.findOpenedByAddress(offerAddress));
   }
 
   async findAllOpened() {
@@ -29,9 +38,13 @@ export class OfferService {
       (
         await this.offerRepository.findAllOpened()
       ).map(async offer => {
-        return await this.serializeOffer(offer);
+        return await this.offerSerializer.serializeOffer(offer);
       })
     );
+  }
+
+  async findByCarId(car_id: string){
+    return await this.offerRepository.findByCarId(car_id)
   }
 
   async createOfferFromTnftEvent({
@@ -76,7 +89,7 @@ export class OfferService {
     // If offer with such a message id exists - skip, it was already processed
     const existingOffer = await this.isDocumentExists(sellDeployedEventMsgId);
 
-    if (existingOffer?.contractAddress) {
+    if (existingOffer?.contract_address) {
       return existingOffer;
     }
 
@@ -97,7 +110,6 @@ export class OfferService {
         accountDeploymentMsgId
       );
 
-
       // Account wasn't deployed, message came from subscription
       if (offerDeployedInfo.status === deployedStatusEnum.rejected) {
         console.log('BLOCKCHAIN_FAILED_PUT_ON_SALE');
@@ -105,7 +117,6 @@ export class OfferService {
       }
 
       return this.confirmCreateOffer({
-        user,
         carAddress: sellDeployedEvent.nftAddress,
         offer,
         offerAddress: sellDeployedEvent.offerAddress,
@@ -115,18 +126,16 @@ export class OfferService {
   }
 
   async confirmCreateOffer({
-    user,
     carAddress,
     offer,
     offerAddress,
     accountDeploymentMsgId,
   }: {
-    user: IUserDto;
     carAddress: string;
-    offer: IOfferDto;
+    offer: IOffer;
     offerAddress: string;
     accountDeploymentMsgId?: string;
-  }): Promise<IOfferDto> {
+  }): Promise<IOffer> {
     const car = await this.carService.findCarByAddress(carAddress);
     let confirmedOffer;
 
@@ -140,11 +149,9 @@ export class OfferService {
 
       console.log(`BLOCKCHAIN_ADD_OFFER: ${offerAddress}`);
 
-      await this.carService.unfreeze(car.id, { offer: offer.id });
-
       return confirmedOffer;
-    } else{
-        throw new Error
+    } else {
+      throw new Error();
     }
   }
   private async confirmOffer({
@@ -157,62 +164,56 @@ export class OfferService {
     offer: IOffer;
     offerAddress: string;
     accountDeploymentMsgId?: string;
-  }):Promise<IOfferDto> {
-    const updateDto: Record<string, any> = {
-      contractAddress: offerAddress,
-      accountDeploymentMsgId,
+  }): Promise<IOffer> {
+    const updateDto: Partial<IOffer> = {
+      contract_address: offerAddress,
       price: fromNano(offer.price),
     };
 
     return this.updateOffer(offer, car ? statusEnum.opened : statusEnum.pending, updateDto);
   }
 
-  collectOfferInfo(itemAddress: string, offer: IOfferDto, user: IUserDto): IOfferInfo {
+  async updateOffer(offer: IOffer, status: statusEnum, updateDto: Partial<IOffer> = {}): Promise<IOffer> {
+    return await this.offerRepository.updateOffer({
+      id: offer.id,
+      status_id: await this.getStatusId(status),
+      ...updateDto,
+    });
+  }
+
+  async getStatusId(status: string) {
+    return await this.offerRepository.getStatusId(status);
+  }
+
+  collectOfferInfo(carAddress: string, offer: IOffer, user?: IUserDto): IOfferInfo {
     return {
-      itemAddress,
+      carAddress,
       offerId: offer.id,
-      contractAddress: offer.contractAddress,
+      contractAddress: offer.contract_address,
       userId: user?.id,
       userAddress: user?.wallet?.address,
     };
   }
 
-  async createOrUpdate(user: IUserDto, createOfferInfo: ICreateOffer): Promise<IOfferDto> {
-    let offer = await this.offerModel.findOne<IOffer>({
-      sellDeployedEventMsgId: createOfferInfo.sellDeployedEventMsgId,
-    });
+  async createOrUpdate(user: IUserDto, createOfferInfo: ICreateOffer): Promise<IOffer> {
+    let offer = await this.offerRepository.findByMessageId(createOfferInfo.sellDeployedEventMsgId);
 
     const car = await this.carService.findCarByAddress(createOfferInfo.itemAddress);
     const status = car!.id ? statusEnum.opened : statusEnum.pending;
 
-    const offerFields = {
-      contractAddress: '',
-      owner: user.id,
-      carId: car!.id ?? null,
-      itemAddress: createOfferInfo.itemAddress,
+    const offerFields: Partial<IOffer> = {
+      contract_address: '',
+      car_id: car!.id ?? null,
       price: createOfferInfo.price,
-      dateCreated: createOfferInfo.dateCreated,
-      status,
-      sellDeployedEventMsgId: createOfferInfo.sellDeployedEventMsgId,
+      date_created: createOfferInfo.dateCreated,
+      message_id: createOfferInfo.sellDeployedEventMsgId,
     };
 
     if (offer) {
-      offer = await this.updateOffer(offer, status, offerFields);
+      return await this.updateOffer(offer, status, offerFields);
     } else {
-      const createdOffer = await new this.offerModel(offerFields).save();
-
-      offer = await createdOffer.populate(this._populateQuery);
-    }
-
-    if (car) {
-      await this.carService.freeze(car.id, blockingReasonsEnum.offer);
-    }
-
-    if (offer) {
-      this.logger.log(`ADD_OFFER: ${JSON.stringify(this.collectOfferInfo(createOfferInfo.itemAddress, offer, user))}`);
-
-      return offer;
-    }
+      return  await this.offerRepository.createOffer(offerFields);
+    }    
   }
 
   async checkIsOfferDeployed(offerAddress: string, sellDeployedEventMsgId: string, accountDeploymentMsgId?: string) {
@@ -254,20 +255,95 @@ export class OfferService {
     };
   }
 
-
   async isDocumentExists(sellDeployedEventMsgId: string) {
-    return await this.serializeOffer(await this.offerRepository.findByAddress(sellDeployedEventMsgId));
+    return await this.offerRepository.findByMessageId(sellDeployedEventMsgId);
   }
 
-  async serializeOffer(offer: IOffer): Promise<IOfferDto> {
-    return {
-      id: offer.id,
-      contractAddress: offer.contract_address,
-      carId: offer.car_id,
-      price: offer.price,
-      dateCreated: offer.date_created,
-      dateClosed: offer.date_closed,
-      status: await this.offerRepository.getStatus(offer.status_id),
-    };
+  async cancelOfferFromEvent({
+    sellCancelledEvent,
+    date,
+  }: {
+    sellCancelledEvent: ISellCancelled;
+    date: number;
+  }): Promise<IOffer | null> {
+    const offer = await this.offerRepository.findByAddress(sellCancelledEvent.offerAddress);
+    const car = await this.carService.findCarByAddress(sellCancelledEvent.nftAddress);
+
+    if (!offer || !car) {
+      throw new Error();
+    }
+
+    console.log(`CANCEL_OFFER: ${JSON.stringify({ offerId: offer.id })}`);
+
+    let nftDataAccount: AbstractNftDataAccount;
+
+    nftDataAccount = await this.contractsService.getTnftDataAccount(car.address!, ROOTS.nftRoot.abi);
+
+    const allowance = await nftDataAccount.waitAllowanceChanges();
+
+    if (allowance) {
+      await this.rejectCancelOffer(car, offer);
+      return null;
+    }
+
+    return this.confirmCancelOffer(car, offer, new Date(date));
   }
+
+  async confirmCancelOffer(car: ICar, offer: IOffer, date_closed: Date): Promise<IOffer> {
+    const closedOffer = await this.updateOffer(offer, statusEnum.canceled, { date_closed });
+
+    console.log(`BLOCKCHAIN_CANCEL_OFFER: ${JSON.stringify({ offerId: offer.id })}`);
+
+    return closedOffer;
+  }
+
+  async rejectCancelOffer(car: ICar, offer: IOffer) {
+    const errorInfo = this.collectOfferInfo(car.address!, offer);
+
+    console.log(`BLOCKCHAIN_FAILED_CANCEL_SALE: ${JSON.stringify(errorInfo)}`);
+  }
+
+  async rejectCloseOffer(newOwner: IUserDto, car: ICar, offer: IOffer) {
+    const offerInfo = this.collectOfferInfo(car.address!, offer, newOwner);
+
+    console.log(`BLOCKCHAIN_FAILED_BUY_TOKEN: ${JSON.stringify(offerInfo)}`);
+  }
+
+  async closeOfferFromEvent({ sellConfirmedEvent, date }: { sellConfirmedEvent: ISellConfirmed; date: Date }) {
+    const car = await this.carService.findCarByAddress(sellConfirmedEvent.nftAddress);
+    const offer = await this.offerRepository.findByAddress(sellConfirmedEvent.offerAddress);
+
+    if (!car || !offer || (await this.offerSerializer.serializeOffer(offer)!).status !== statusEnum.opened) {
+      return;
+    }
+
+    let nftDataAccount: AbstractNftDataAccount;
+
+    nftDataAccount = this.contractsService.getTnftDataAccount(car.address!, ROOTS.nftRoot.abi);
+
+    await this.updateOffer(offer, statusEnum.closing, { date_closed: date });
+
+    console.log(`CLOSE_OFFER: ${JSON.stringify({ offerId: offer.id })}`);
+
+    // Find user or create new one if he bought via surf, oberton(everspace) or deBot
+    const user = await this.userService.findOrCreateUserWithWallet(sellConfirmedEvent.newOwnerAddress);
+
+    try {
+      await this.confirmCloseOffer(user, car, offer);
+    } catch (e) {
+      console.error(`OFFER_CLOSING: ${JSON.stringify(e)}`);
+    }
+  }
+
+  async confirmCloseOffer(newOwner: IUserDto, car: ICar, offer: IOffer): Promise<IOffer> {
+    const offerInfo = this.collectOfferInfo(car.address!, offer, newOwner);
+    let updatedOffer;
+
+    updatedOffer = await this.updateOffer(offer, statusEnum.closed);
+    const updateCar = await this.carService.updateOwner(newOwner.id, car.id);
+
+    console.log(`BLOCKCHAIN_BUY_TOKEN: ${JSON.stringify(offerInfo)}`);    
+
+    return updatedOffer;
+  }  
 }

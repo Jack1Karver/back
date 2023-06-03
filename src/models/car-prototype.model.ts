@@ -8,4 +8,5 @@ export interface ICarPrototype {
     address?: string;
     json?: string;
     json_hash?: string
+    date_created: Date;
   }

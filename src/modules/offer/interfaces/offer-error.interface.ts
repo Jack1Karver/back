@@ -1,9 +1,8 @@
-import { Types } from 'mongoose';
 
 export interface IOfferInfo {
-  itemAddress: string;
-  userId: Types.ObjectId;
-  userAddress: string;
-  offerId: Types.ObjectId;
+  carAddress: string;
+  userId?: number;
+  userAddress?: string;
+  offerId: number;
   contractAddress: string;
 }

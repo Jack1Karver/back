@@ -37,6 +37,11 @@ contract Sell is Offer {
         proceedDeal();
     }
 
+    
+    function cancel() external{
+        cancelOrder();
+    }
+
     receive() external {
         proceedDeal();
     }

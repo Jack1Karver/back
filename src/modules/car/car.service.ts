@@ -7,22 +7,25 @@ import { IMark } from '../../models/mark.model';
 import { IModel } from '../../models/model.model';
 import { IUser } from '../../models/user.model';
 import { hexToUtf8 } from '../../utils/contract.util';
-import { ContractsService } from '../contracts/contracts.service';
 import { FilesService } from '../files/files.service';
 import { UserService } from '../user/user.service';
-import { createHashName } from '../wallet/crypt.util';
+import { createHashName } from '../../utils/crypt.util';
 import { CarRepository } from './car.repository';
-import { CarSubscriber } from './car.subscriber';
 import { ICarPrototypeDto } from './interfaces/car-prototype.dto';
 import { ICar, ICarFeaturesDto } from './interfaces/car.dto';
 import { IMarkDto } from './interfaces/mark.dto';
 import { IModelDto } from './interfaces/model.dto';
 import { IUploadFileDto } from './interfaces/upload-file.dto';
+import { OfferService } from '../offer/offer.service';
+import { OfferRepository } from '../offer/offer.repository';
+import { OfferSerializer } from '../offer/offer.serializer';
 
 export class CarService {
   userService = new UserService();
   filesService = new FilesService();
   carRepository = new CarRepository();
+  offerRepository = new OfferRepository();
+  offerSerializer = new OfferSerializer();
 
   async getPopularMarks() {
     try {
@@ -60,6 +63,7 @@ export class CarService {
       car_features_id: await this.createFeatures(car.carFeatures),
       description: car.description,
       owner_id: user.id,
+      date_created: new Date(),
     });
 
     return await this.serializePrototype(await this.carRepository.getPrototype(prototype));
@@ -79,6 +83,11 @@ export class CarService {
     });
   }
 
+
+  updateOwner = (ownerId:number, carId: string)=>{
+    this.carRepository.updateOwner(carId, ownerId)
+  }
+
   async uploadCarPrototypeFiles(files: Express.Multer.File[], upload: IUploadFileDto) {
     const carPrototype = await this.carRepository.getPrototype(upload.carId);
     if (carPrototype) {
@@ -89,53 +98,57 @@ export class CarService {
 
       await this.carRepository.updateCarPrototype(carPrototype);
     }
-    return await this.serializePrototype(await this.carRepository.getPrototype(carPrototype.id))
+    return await this.serializePrototype(await this.carRepository.getPrototype(carPrototype.id));
   }
 
-  async deletePrototype(id: string| number){
-    await this.carRepository.deletePrototype(id)
+  async deletePrototype(id: string | number) {
+    await this.carRepository.deletePrototype(id);
   }
 
-  async findPrototypeOnCreation(json:string, ownerAddr: string){
-    console.log()
-    return await this.carRepository.getPrototypeOnCreation(json, ownerAddr)
+  async findPrototypeOnCreation(json: string, ownerAddr: string) {
+    return await this.carRepository.getPrototypeOnCreation(json, ownerAddr);
   }
 
-  async createItemFromEvent(
-    eventValue: ITokenMintedEvent,
-  ){
-    let carPrototype = await this.findPrototypeOnCreation(
-      hexToUtf8(eventValue.url),
-      eventValue.ownerAddr
-    )
-    console.log(carPrototype)
-    this.createCar(carPrototype, eventValue.dataAddr)
+  async createItemFromEvent(eventValue: ITokenMintedEvent) {
+    let carPrototype = await this.findPrototypeOnCreation(hexToUtf8(eventValue.url), eventValue.ownerAddr);
+    this.createCar(carPrototype, eventValue.dataAddr);
   }
 
-  async createCar(carPrototype: ICarPrototype, address: string){
-    const files = await this.carRepository.getFilesPrototype(carPrototype.id)
+  async createCar(carPrototype: ICarPrototype, address: string) {
+    const files = await this.carRepository.getFilesPrototype(carPrototype.id);
     const carId = await this.carRepository.createCar(carPrototype, address);
-    Promise.all(files.map(async file=>{
-      await this.carRepository.addFile(file.path, carId)
-    }))
-    const car = await this.carRepository.getCar(carId)
-    this.deletePrototype(carPrototype.id)
+    Promise.all(
+      files.map(async file => {
+        await this.carRepository.addFile(file.path, carId);
+      })
+    );
+    const car = await this.carRepository.getCar(carId);
+    this.deletePrototype(carPrototype.id);
   }
 
-  async getMarkByName(name: string){
-    return await this.serializeMark(await this.carRepository.getMarkByName(name))
+  async getMarkByName(name: string) {
+    return await this.serializeMark(await this.carRepository.getMarkByName(name));
   }
 
-  async getModelByName(name: string, markId: string){
-    return await this.serializeModel(await this.carRepository.getModelByName(name, markId))
+  async getModelByName(name: string, markId: string) {
+    return await this.serializeModel(await this.carRepository.getModelByName(name, markId));
   }
 
-  async findCar(id: number){
-    return await this.serializeCar(await this.carRepository.getCar(id))
+  async findCar(id: number) {
+    return await this.serializeCar(await this.carRepository.getCar(id));
   }
 
-  async findCarByAddress(address: string){
-    return await this.serializeCar(await this.carRepository.getCarByAddress(address))
+  async findCarByAddress(address: string) {
+    return await this.serializeCar(await this.carRepository.getCarByAddress(address));
+  }
+
+  async getOffers() {
+    const cars = await this.carRepository.getOffers();
+    return await Promise.all(
+      cars.map(async car => {
+        return await this.serializeCar(car);
+      })
+    );
   }
 
   async serializeMark(mark: IMark): Promise<IMarkDto> {
@@ -151,7 +164,7 @@ export class CarService {
     try {
       const owner = await this.userService.getUserById(prototype.owner_id);
       if (owner) {
-        const files = this.filesService.getPrototypeFiles(prototype.id)
+        const files = this.filesService.getPrototypeFiles(prototype.id);
         return {
           id: prototype.id,
           carFeatures: await this.serializeFeatures(await this.carRepository.getCarFeatures(prototype.car_features_id)),
@@ -159,7 +172,7 @@ export class CarService {
           owner: owner,
           json: prototype.json,
           jsonHash: prototype.json_hash,
-          files: await this.filesService.getPrototypeFiles(prototype.id)
+          files: await this.filesService.getPrototypeFiles(prototype.id),
         };
       } else throw { message: 'User not found' };
     } catch (e) {
@@ -203,10 +216,14 @@ export class CarService {
     }
   }
 
-  async serializeCar(car:ICarAd):Promise<ICar| null>{
-    const owner = await this.userService.getUserById(car.owner_id)
-    if(owner){
-    return {
+  async serializeCar(car: ICarAd): Promise<ICar | null> {
+    const owner = await this.userService.getUserById(car.owner_id);
+    const status_id = await this.carRepository.getStatusId('opened')
+    const offer = await this.offerRepository.findActiveByCarId(car.id, status_id);
+    console.log(car.id)
+    console.log(offer)
+    if (owner) {
+      return {
         id: car.id,
         carFeatures: await this.serializeFeatures(await this.carRepository.getCarFeatures(car.car_features_id)),
         address: car.address,
@@ -215,8 +232,10 @@ export class CarService {
         json: car.json,
         jsonHash: car.json_hash,
         dateCreated: car.date_created,
-        files: await this.filesService.getFiles(car.id)
-    };
-  } return null
+        files: await this.filesService.getFiles(car.id),
+        offer: offer ? await this.offerSerializer.serializeOffer(offer) : undefined,
+      };
+    }
+    return null;
   }
 }

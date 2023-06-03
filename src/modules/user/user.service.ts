@@ -1,5 +1,5 @@
 import { IUser } from '../../models/user.model';
-import { createHashName, stripAddress } from '../wallet/crypt.util';
+import { createHashName, stripAddress } from '../../utils/crypt.util';
 import { walletTypeEnum } from '../wallet/enums/wallet-type.enum';
 import { WalletService } from '../wallet/wallet.service';
 import { IUserDto } from './dto/user.dto';
@@ -9,6 +9,15 @@ import { UserRepository } from './user.repository';
 import { v4 as uuidV4 } from 'uuid';
 
 export class UserService {
+
+  async findOrCreateUserWithWallet(newOwnerAddress: string) {
+    const user = await this.getUserByWalletAddress(newOwnerAddress)
+    if(user){
+      return user
+    } else{
+      return await this.createWithWallet(newOwnerAddress)
+    }
+  }
   private userRepository = new UserRepository();
   private walletService = new WalletService();
 

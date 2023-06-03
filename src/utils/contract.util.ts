@@ -25,7 +25,7 @@ const isNear = (x: string | number, y: string | number) =>
   Math.abs(parseInt(y.toString()) - parseInt(x.toString())) < 200000000; // 2e8
 
 const toNano = (n: number) => n * 1000000000; // 1e9
-const fromNano = (n: number) => n / 1000000000;
+const fromNano = (n: number) => {return n / 1000000000};
 
 const sleep = (ms = 0) => new Promise(resolve => setTimeout(resolve, ms));
 

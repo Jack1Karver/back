@@ -25,7 +25,7 @@ AuthController.post('/extension/auth', async (req, res) => {
 
 AuthController.post('/logout', [passport.authenticate('jwt', { session: false })], async (req, res) => {
   const user = req.user as IUser;
-  authService.clearJWTCookie(res)
+  authService.clearJWTCookie(res);
 
-  return await authService.logout(user.id)
+  return await authService.logout(user.id);
 });

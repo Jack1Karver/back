@@ -5,7 +5,6 @@ import { SECRET_TOKEN } from '../config/secret';
 import { TokenRepository } from '../modules/token/token.repository';
 import { IUser } from '../models/user.model';
 import { UserService } from '../modules/user/user.service';
-import { AuthService } from '../modules/auth/auth.service';
 
 const userRepository = new UserRepository
 const tokenReposiory = new TokenRepository

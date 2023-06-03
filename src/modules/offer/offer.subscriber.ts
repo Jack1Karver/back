@@ -30,10 +30,10 @@ export class OfferSubscriber {
       const tnftOffers = await this.offerService.findAllOpened();
 
       tnftOffers.forEach(offer => {
-        if (offer.contractAddress && offer.status === statusEnum.opened) {
+        if (offer.contractAddress && offer.status === 'opened') {
           this.offerAddresses[offer.contractAddress] = true;
         }
-      });
+      });      
 
       this.subscribe();
     })();
@@ -101,6 +101,7 @@ export class OfferSubscriber {
         }
       }
     );
+    console.log(`SUBSCRIBED_TO_OFFER`);
   }
 
   private async subscribeToOffers(): Promise<void> {
@@ -124,13 +125,14 @@ export class OfferSubscriber {
 
     console.log(`SELL_ROOT_MESSAGE_DECODED: ${JSON.stringify(decoded)}`);
 
-    if (decoded.body_type == MessageBodyType.Event) {
+    if (decoded.body_type == MessageBodyType.Event && decoded.name !== 'SellDeclined') {
       await this.offerService.createOfferFromTnftEvent({
         eventValue: decoded.value,
         dateCreatedTimestamp: message.created_at,
         sellDeployedEventMsgId: message.id,
-        sellRoot,
+        sellRoot: sellRoot!.address,
       });
+      await this.subscribeToOffer(decoded.value.offerAddress)
     }
   }
 
@@ -146,26 +148,26 @@ export class OfferSubscriber {
   ): Promise<void> {
     const offerAddress = message.src;
     const offer = await this.offerService.findOpenedByAddress(offerAddress);
-    const car = await this.carService.findCar(offer.carId)
+    const car = await this.carService.findCar(<number><unknown>offer.carId)
     if(car){
     switch (decoded.name) {
       case offerContractsEventsEnum.sellConfirmed:
-        await this.offerService.closeOfferFromTnftEvent({
+        await this.offerService.closeOfferFromEvent({
           sellConfirmedEvent: {
             offerAddress: offer.contractAddress,
-            nftAddress: car.address,
+            nftAddress: car.address!,
             newOwnerAddress: decoded.value.newOwner,
           },
-          dateTimestamp: message.created_at,
+          date: new Date(message.created_at),
         });
         break;
       case offerContractsEventsEnum.sellCancelled:
-        await this.offerService.cancelOfferFromTnftEvent({
+        await this.offerService.cancelOfferFromEvent({
           sellCancelledEvent: {
             offerAddress: offer.contractAddress,
-            nftAddress: car.address,
+            nftAddress: car.address!,
           },
-          dateTimestamp: message.created_at,
+          date: message.created_at,
         });
     }
 }
@@ -183,5 +185,7 @@ export class OfferSubscriber {
     delete this.messagesSubscription[address];
     console.log(`OFFER_REMOVED_FROM_SUBSCRIPTION: ${JSON.stringify({ address })}`);
   }
+
+  
 
 }
