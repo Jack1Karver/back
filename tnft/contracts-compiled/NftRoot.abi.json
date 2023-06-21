@@ -1,0 +1,181 @@
+{
+	"ABI version": 2,
+	"header": ["pubkey", "time", "expire"],
+	"functions": [
+		{
+			"name": "constructor",
+			"inputs": [
+				{"name":"codeIndex","type":"cell"},
+				{"name":"codeData","type":"cell"},
+				{"name":"_pubkey","type":"uint256"},
+				{"name":"_ownerAddress","type":"address"},
+				{"name":"_name","type":"bytes"},
+				{"name":"_symbol","type":"bytes"},
+				{"name":"_managersList","type":"address[]"},
+				{"name":"_mintingFee","type":"uint128"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "mint",
+			"inputs": [
+				{"name":"_name","type":"bytes"},
+				{"name":"_url","type":"bytes"},
+				{"name":"_royalty","type":"uint8"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "deployBasis",
+			"inputs": [
+				{"name":"codeIndexBasis","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "destructBasis",
+			"inputs": [
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "addManager",
+			"inputs": [
+				{"name":"_addr","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "removeManager",
+			"inputs": [
+				{"name":"_addr","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "getManagersList",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"managers","type":"address[]"}
+			]
+		},
+		{
+			"name": "changeMintingFee",
+			"inputs": [
+				{"name":"_value","type":"uint128"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "changeInternalOwner",
+			"inputs": [
+				{"name":"_owner","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "changeExternalOwner",
+			"inputs": [
+				{"name":"_pubkey","type":"uint256"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "withdraw",
+			"inputs": [
+				{"name":"_dest","type":"address"},
+				{"name":"_value","type":"uint128"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "resolveCodeHashIndex",
+			"inputs": [
+				{"name":"addrRoot","type":"address"},
+				{"name":"addrOwner","type":"address"}
+			],
+			"outputs": [
+				{"name":"codeHashIndex","type":"uint256"}
+			]
+		},
+		{
+			"name": "resolveIndex",
+			"inputs": [
+				{"name":"addrRoot","type":"address"},
+				{"name":"addrData","type":"address"},
+				{"name":"addrOwner","type":"address"}
+			],
+			"outputs": [
+				{"name":"addrIndex","type":"address"}
+			]
+		},
+		{
+			"name": "resolveCodeHashData",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"codeHashData","type":"uint256"}
+			]
+		},
+		{
+			"name": "resolveData",
+			"inputs": [
+				{"name":"addrRoot","type":"address"},
+				{"name":"id","type":"uint256"}
+			],
+			"outputs": [
+				{"name":"addrData","type":"address"}
+			]
+		},
+		{
+			"name": "name",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"name","type":"bytes"}
+			]
+		},
+		{
+			"name": "symbol",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"symbol","type":"bytes"}
+			]
+		},
+		{
+			"name": "mintingFee",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"mintingFee","type":"uint128"}
+			]
+		}
+	],
+	"data": [
+	],
+	"events": [
+		{
+			"name": "tokenMinted",
+			"inputs": [
+				{"name":"ownerAddr","type":"address"},
+				{"name":"dataAddr","type":"address"},
+				{"name":"name","type":"bytes"},
+				{"name":"url","type":"bytes"}
+			],
+			"outputs": [
+			]
+		}
+	]
+}

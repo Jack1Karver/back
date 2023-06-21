@@ -1,0 +1,1 @@
+ALTER TABLE car_prototype ADD COLUMN date_created date

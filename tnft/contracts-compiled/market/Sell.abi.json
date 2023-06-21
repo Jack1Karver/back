@@ -1,0 +1,129 @@
+{
+	"ABI version": 2,
+	"header": ["pubkey", "time", "expire"],
+	"functions": [
+		{
+			"name": "constructor",
+			"inputs": [
+				{"name":"_markerRootAddr","type":"address"},
+				{"name":"_tokenRootAddr","type":"address"},
+				{"name":"_addrOwner","type":"address"},
+				{"name":"_marketFee","type":"uint8"},
+				{"name":"_marketFeeDecimals","type":"uint8"},
+				{"name":"_royalty","type":"uint8"},
+				{"name":"_royaltyAuthor","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "buyToken",
+			"inputs": [
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "cancelOrder",
+			"inputs": [
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "getRoyaltyInfo",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"value","type":"uint8"},
+				{"name":"author","type":"address"}
+			]
+		},
+		{
+			"name": "price",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"price","type":"uint128"}
+			]
+		},
+		{
+			"name": "addrData",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"addrData","type":"address"}
+			]
+		},
+		{
+			"name": "markerRootAddr",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"markerRootAddr","type":"address"}
+			]
+		},
+		{
+			"name": "tokenRootAddr",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"tokenRootAddr","type":"address"}
+			]
+		},
+		{
+			"name": "addrOwner",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"addrOwner","type":"address"}
+			]
+		},
+		{
+			"name": "marketFee",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"marketFee","type":"uint128"}
+			]
+		},
+		{
+			"name": "marketFeeDecimals",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"marketFeeDecimals","type":"uint8"}
+			]
+		},
+		{
+			"name": "isActive",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"isActive","type":"bool"}
+			]
+		}
+	],
+	"data": [
+		{"key":1,"name":"price","type":"uint128"},
+		{"key":2,"name":"addrData","type":"address"},
+		{"key":3,"name":"deployHash","type":"bytes"}
+	],
+	"events": [
+		{
+			"name": "sellConfirmed",
+			"inputs": [
+				{"name":"newOwner","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "sellCancelled",
+			"inputs": [
+			],
+			"outputs": [
+			]
+		}
+	]
+}

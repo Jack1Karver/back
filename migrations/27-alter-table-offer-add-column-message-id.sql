@@ -1,0 +1,1 @@
+ALTER TABLE offer ADD COLUMN message_id varchar;

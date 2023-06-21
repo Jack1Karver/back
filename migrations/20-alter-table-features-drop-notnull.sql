@@ -1,0 +1,1 @@
+ALTER TABLE car_features ALTER COLUMN engine_capacity DROP NOT NULL;

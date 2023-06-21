@@ -21,6 +21,7 @@ export class Connection {
 
         }catch(e){
             console.log(e);
+            console.log('QUERY: '+ queryTextOrConfig)
             throw new Error();
         } finally {
             client.release();

@@ -1,0 +1,1 @@
+ALTER TABLE car_ad ADD COLUMN date_created date;
